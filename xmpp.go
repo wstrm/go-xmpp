@@ -721,6 +721,21 @@ func (c *Client) SendHtml(chat Chat) (n int, err error) {
 		xmlEscape(chat.Remote), xmlEscape(chat.Type), xmlEscape(chat.Text), chat.Text)
 }
 
+// SendOOB sends a message containing a Out of Bounds Data (from an URI) defined
+// by XEP-0066.
+func (c *Client) SendOOB(chat Chat, uri string) (n int, err error) {
+	stanza := "<message to='%s' type='%s' id='%s' xml:lang='en'><body>%s</body><x xmlns='jabber:x:oob'><url>%s</url></x></message>"
+
+	return c.SendOrg(
+		fmt.Sprintf(stanza,
+			xmlEscape(chat.Remote),
+			xmlEscape(chat.Type),
+			cnonce(),
+			xmlEscape(chat.Text),
+			uri,
+		))
+}
+
 // Roster asks for the chat roster.
 func (c *Client) Roster() error {
 	fmt.Fprintf(c.conn, "<iq from='%s' type='get' id='roster1'><query xmlns='jabber:iq:roster'/></iq>\n", xmlEscape(c.jid))
